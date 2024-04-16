@@ -1,0 +1,453 @@
+openapi: 3.0.3
+info:
+  title: User Management
+  description: |-
+    Project Requirements
+      - Build a digital newspaper system
+        - Scope 2 authority: ADMIN, USER
+        - Admin/user can login/logout, update their profile, password
+        - User basic information: email, phone, firstname, lastname, dob
+        - Register only for user
+        - Admin can view, edit, and delete user; but user can’t
+  contact:
+    email: ndphuong-batch43@sdc.edu.vn
+  version: 1.0.11
+servers:
+  - url: http://localhost:8000/api
+tags:
+  - name: user
+    description: APIs related to users
+  - name: auth
+    description: APIs related to admin
+paths:
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: Register user
+      description: Register user to server
+      operationId: registerUser
+      requestBody:
+        description: Register user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: user Registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "User registered successfully!!!"
+                  resData:
+                    $ref: "#/components/schemas/Logged"
+        "400":
+          description: Validation error in request body/user creation failed
+        "422":
+          description: User registration failed!
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logout user
+      description: ""
+      operationId: logout user
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "You have successfully logged out !!!"
+
+        "400":
+          description: Validation error in request body
+        "404":
+          description: refreshToken not found
+  /user/refreshToken:
+    get:
+      tags:
+        - user
+      summary: RefreshToken user
+      description: ""
+      operationId: RefreshToken user
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "Update refreshToken successfully !!!"
+
+        "400":
+          description: No refreshToken found in cookie
+        "500":
+          description: Internal Server Error!!!
+  /user/changePassword:
+    patch:
+      tags:
+        - user
+      summary: Change password user
+      description: Change password user to server
+      operationId: Change user password
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Change password user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePassword"
+        required: true
+      responses:
+        "200":
+          description: user Registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "Changed password successfully!!!"
+        "400":
+          description: Validation error in request body/Current password is incorrect
+        "404":
+          description: User not found !!!
+  /user:
+    put:
+      tags:
+        - user
+      summary: Update profile user
+      description: Update profile user to server
+      operationId: update user profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Update profile user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: user Registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "User registered successfully!!!"
+                  resData:
+                    $ref: "#/components/schemas/Logged"
+        "400":
+          description: Validation error in request body
+        "404":
+          description: No information found for User !!!
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Login user
+      description: Login user to server
+      operationId: loginUser
+      requestBody:
+        description: Login user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+        required: true
+      responses:
+        "200":
+          description: User logged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "Logged successfully!!!"
+                  resData:
+                    $ref: "#/components/schemas/Logged"
+        "400":
+          description: Validation error in request body/user logged failed
+        "404":
+          description: This email is not in use yet
+  /user/{userId}:
+    get:
+      tags:
+        - user
+      summary: Get user by user id
+      description: ""
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          description: "The id that needs to be fetched. Use 60dc495b-1f6c-4e3a-807b-9318e4e370d8 for testing. "
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "Found information successfully !!!"
+                  resData:
+                    $ref: "#/components/schemas/User"
+
+        "400":
+          description: Validation error in request body
+        "404":
+          description: No information found for userId
+
+  /auth/createUser:
+    post:
+      tags:
+        - auth
+      summary: Create user
+      description: Create user to server
+      operationId: createUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Create user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: user Created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "User Created successfully!!!"
+                  resData:
+                    $ref: "#/components/schemas/Logged"
+        "400":
+          description: Validation error in request body/user creation failed
+
+  /auth/:
+    get:
+      tags:
+        - auth
+      summary: Read user
+      description: ""
+      operationId: user pagination and search functionality
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: The page number for pagination
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: The maximum number of users per page
+        - in: query
+          name: searchText
+          required: false
+          schema:
+            type: string
+          description: Search text to filter users by email, first name, or last name
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "Get data successfully !!!"
+                  resData:
+                    $ref: "#/components/schemas/User"
+
+        "400":
+          description: Validation error in request body
+
+  /auth/{userId}:
+    delete:
+      tags:
+        - auth
+      summary: Delete user by user id
+      description: ""
+      operationId: deleteUserById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: "The id that needs to be fetched. Use 5fa5e7e9-170d-4172-94e8-948e0e72bfa6 for testing. "
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      ok:
+                        type: boolean
+                        example: "true"
+                      message:
+                        type: string
+                        example: "Delete user successfully !!! !!!"
+        "404":
+          description: Invalid userId
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: sin
+        lastName:
+          type: string
+          example: lee
+        email:
+          type: string
+          example: leesin@gmail.com
+        phone:
+          type: string
+          example: 0362598631
+        password:
+          type: string
+          example: leesin123
+        dob:
+          type: string
+          example: 1999-01-01
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          example: leesin@gmail.com
+        password:
+          type: string
+          example: leesin123
+    ChangePassword:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          example: 000000
+        newPassword:
+          type: string
+          example: 7777777
+        newPasswordConfirm:
+          type: string
+          example: 7777777
+    Logged:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM0MzJlMTE5LTMyNWQtNDcwNi05NmUxLThhMWQ4ZjNiMTU0OSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzA5MTEwMDI2LCJleHAiOjE3MDkxMTM2MjZ9.DZsR_JZj97AdM3agay7DPIPaLyYZBFdCoRXo0JTm0DU
+        userData:
+          $ref: "#/components/schemas/User"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
